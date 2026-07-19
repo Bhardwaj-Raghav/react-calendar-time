@@ -120,12 +120,21 @@ npm install
 npm test             # unit tests (Vitest)
 npm run test:watch   # watch mode
 npm run dev          # interactive playground (localhost:5173)
-npm run website      # marketing landing + live demo (localhost:5174)
+npm run website      # Astro landing (SSG) at localhost:5174
 npm run storybook    # Storybook (localhost:6006)
 npm run build
-npm run website:build  # static site → site-dist/
+npm run website:build  # Astro static build → site-dist/
 npm run screenshots    # refresh examples/*.png for the README
 ```
+
+Set `SITE_URL` when building for production if your domain differs from the default:
+
+```bash
+# PowerShell
+$env:SITE_URL="https://your-domain.com"; npm run website:build
+```
+
+Astro reads `SITE_URL` in [`website/astro.config.mjs`](website/astro.config.mjs) for canonical URLs and the sitemap.
 
 ## License
 

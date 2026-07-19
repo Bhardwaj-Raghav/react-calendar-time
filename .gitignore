@@ -4,6 +4,7 @@ site-dist
 coverage
 storybook-static
 .cursor
+**/.astro
 *.log
 .DS_Store
 .idea
