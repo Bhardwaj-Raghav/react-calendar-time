@@ -17,7 +17,7 @@ function App() {
 
   return (
     <main className="playground">
-      <h1>react-datetime-picker-component</h1>
+      <h1>react-calendar-time</h1>
       <p className="subtitle">Local playground for the v1 API</p>
 
       <section>

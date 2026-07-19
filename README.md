@@ -1,18 +1,18 @@
-[![npm](https://img.shields.io/npm/v/react-datetime-picker-component.svg)](https://www.npmjs.com/package/react-datetime-picker-component)
+[![npm](https://img.shields.io/npm/v/react-calendar-time.svg)](https://www.npmjs.com/package/react-calendar-time)
 [![CI](https://github.com/Bhardwaj-Raghav/react-datetime-picker-component/actions/workflows/ci.yml/badge.svg)](https://github.com/Bhardwaj-Raghav/react-datetime-picker-component/actions/workflows/ci.yml)
 
-# react-datetime-picker-component
+# react-calendar-time
 
 Accessible React date and time picker with TypeScript types, controlled/uncontrolled APIs, and CSS variable theming.
 
 ## Install
 
 ```bash
-npm install react-datetime-picker-component
+npm install react-calendar-time
 ```
 
 ```bash
-yarn add react-datetime-picker-component
+yarn add react-calendar-time
 ```
 
 Peer dependencies: `react` and `react-dom` (≥ 17).
@@ -31,8 +31,8 @@ Peer dependencies: `react` and `react-dom` (≥ 17).
 
 ```tsx
 import { useState } from "react";
-import DateTime, { DateTimeInput } from "react-datetime-picker-component";
-import "react-datetime-picker-component/style.css";
+import DateTime, { DateTimeInput } from "react-calendar-time";
+import "react-calendar-time/style.css";
 
 function App() {
   const [value, setValue] = useState<string | null>(null);
@@ -108,7 +108,7 @@ Override CSS variables:
 
 ```tsx
 import "dayjs/locale/fr";
-import { DateTime } from "react-datetime-picker-component";
+import { DateTime } from "react-calendar-time";
 
 <DateTime locale="fr" weekStartsOn={1} inline onChange={console.log} />
 ```

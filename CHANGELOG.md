@@ -9,7 +9,8 @@ Breaking rewrite of the library for production use.
 - Publish only `dist/` with a proper `exports` map
 - Move `react` / `react-dom` to peer dependencies
 - Replace Moment with `dayjs`
-- Ship plain CSS (`react-datetime-picker-component/style.css`) — consumers no longer need Sass
+- Ship plain CSS (`react-calendar-time/style.css`) — consumers no longer need Sass
+- Package renamed from `react-datetime-picker-component` to `react-calendar-time`
 
 ### API
 - Replace `onClick` with `onChange`

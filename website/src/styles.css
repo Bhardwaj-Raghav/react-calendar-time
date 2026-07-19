@@ -91,10 +91,7 @@ a {
 }
 
 .brand-name {
-  max-width: 14rem;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
 }
 
 .topnav {
@@ -394,10 +391,6 @@ a {
 
   .hero-brand {
     max-width: none;
-  }
-
-  .brand-name {
-    max-width: 10rem;
   }
 }
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
-import DateTime, { DateTimeInput, DateTimeRange } from "react-datetime-picker-component";
+import DateTime, { DateTimeInput, DateTimeRange } from "react-calendar-time";
 
-const INSTALL = "npm install react-datetime-picker-component";
+const INSTALL = "npm install react-calendar-time";
 
 const FEATURES = [
   {
@@ -49,7 +49,7 @@ export default function App() {
       <header className="topbar">
         <a className="brand" href="#top">
           <span className="brand-mark" aria-hidden="true" />
-          <span className="brand-name">react-datetime-picker-component</span>
+          <span className="brand-name">react-calendar-time</span>
         </a>
         <nav className="topnav">
           <a href="#demo">Demo</a>
@@ -68,7 +68,7 @@ export default function App() {
         <section className="hero">
           <div className="hero-copy">
             <p className="eyebrow">v1.0 · React date &amp; time</p>
-            <h1 className="hero-brand">react-datetime-picker-component</h1>
+            <h1 className="hero-brand">react-calendar-time</h1>
             <p className="hero-lead">
               An accessible, typed picker you can drop into any React app —
               date, time, or both.
@@ -147,8 +147,8 @@ export default function App() {
           <h2>Minimal usage</h2>
           <pre>
             <code>{`import { useState } from "react";
-import DateTime, { DateTimeInput } from "react-datetime-picker-component";
-import "react-datetime-picker-component/style.css";
+import DateTime, { DateTimeInput } from "react-calendar-time";
+import "react-calendar-time/style.css";
 
 function App() {
   const [value, setValue] = useState(null);
@@ -162,7 +162,7 @@ function App() {
         <p>
           MIT ·{" "}
           <a
-            href="https://www.npmjs.com/package/react-datetime-picker-component"
+            href="https://www.npmjs.com/package/react-calendar-time"
             target="_blank"
             rel="noreferrer"
           >
