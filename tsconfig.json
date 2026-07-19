@@ -1,0 +1,36 @@
+{
+  "compilerOptions": {
+    "target": "ES2020",
+    "lib": ["ES2020", "DOM", "DOM.Iterable"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "jsx": "react-jsx",
+    "strict": true,
+    "noUncheckedIndexedAccess": true,
+    "skipLibCheck": true,
+    "esModuleInterop": true,
+    "forceConsistentCasingInFileNames": true,
+    "isolatedModules": true,
+    "resolveJsonModule": true,
+    "declaration": true,
+    "declarationMap": true,
+    "noEmit": true,
+    "types": ["vitest/globals", "vite/client"]
+  },
+  "include": [
+    "src",
+    "tests",
+    "vitest.setup.ts",
+    "styles.d.ts",
+    "playground/**/*.tsx",
+    "playground/**/*.ts",
+    "playground/**/*.d.ts"
+  ],
+  "exclude": [
+    "dist",
+    "node_modules",
+    "playground/vite.config.ts",
+    ".storybook",
+    "website"
+  ]
+}

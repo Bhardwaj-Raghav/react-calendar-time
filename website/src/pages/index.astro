@@ -1,0 +1,116 @@
+---
+import BaseLayout from "../layouts/BaseLayout.astro";
+import CopyInstall from "../components/CopyInstall";
+import HeroDemo from "../components/HeroDemo";
+import ExamplesDemo from "../components/ExamplesDemo";
+import { GITHUB_URL, NPM_URL } from "../site.config";
+
+const features = [
+  {
+    title: "Typed by default",
+    body: "First-class TypeScript exports, ESM/CJS builds, and a clean peer-dep story for React 17+.",
+  },
+  {
+    title: "Keyboard-first accessibility",
+    body: "Dialog semantics, focus trap, Escape to dismiss, and arrow-key calendar navigation.",
+  },
+  {
+    title: "CSS-variable theming",
+    body: "Ship one stylesheet and restyle with variables — primary, surface, danger, and radius.",
+  },
+];
+
+const installSnippet = `import { useState } from "react";
+import DateTime, { DateTimeInput } from "react-calendar-time";
+import "react-calendar-time/style.css";
+
+function App() {
+  const [value, setValue] = useState(null);
+  return <DateTimeInput value={value} onChange={setValue} />;
+}`;
+---
+
+<BaseLayout>
+  <div class="site is-ready">
+    <div class="site-bg" aria-hidden="true"></div>
+
+    <header class="topbar">
+      <a class="brand" href="#top">
+        <span class="brand-mark" aria-hidden="true"></span>
+        <span class="brand-name">react-calendar-time</span>
+      </a>
+      <nav class="topnav" aria-label="Primary">
+        <a href="#demo">Live demo</a>
+        <a href="#features">Features</a>
+        <a href="#examples">Examples</a>
+        <a href="#install">Install</a>
+        <a href={GITHUB_URL} target="_blank" rel="noreferrer">GitHub</a>
+      </nav>
+    </header>
+
+    <main id="top">
+      <section class="hero" aria-labelledby="hero-heading">
+        <div class="hero-copy">
+          <p class="eyebrow">v1.0 · npm package for React</p>
+          <p class="brand-kicker">react-calendar-time</p>
+          <h1 id="hero-heading" class="hero-brand">React date and time picker</h1>
+          <p class="hero-lead">
+            An accessible, typed calendar and datetime component for React —
+            pick dates, times, or ranges with a themable UI.
+          </p>
+          <CopyInstall client:load />
+        </div>
+
+        <HeroDemo client:load />
+      </section>
+
+      <section class="features" id="features" aria-labelledby="features-heading">
+        <h2 id="features-heading" class="section-heading">
+          Why developers choose this React calendar picker
+        </h2>
+        <div class="features-grid">
+          {
+            features.map((feature, index) => (
+              <article
+                class="feature"
+                style={`animation-delay: ${0.12 + index * 0.08}s`}
+              >
+                <h3>{feature.title}</h3>
+                <p>{feature.body}</p>
+              </article>
+            ))
+          }
+        </div>
+      </section>
+
+      <section class="showcase" id="examples" aria-labelledby="examples-heading">
+        <div class="showcase-head">
+          <h2 id="examples-heading">Date, time, and range examples</h2>
+          <p>
+            Inline calendar, scrollable time lists, and date range selection —
+            one theme system throughout.
+          </p>
+        </div>
+        <ExamplesDemo client:visible />
+      </section>
+
+      <section class="snippet" id="install" aria-labelledby="install-heading">
+        <h2 id="install-heading">Install the React datetime picker</h2>
+        <pre><code>{installSnippet}</code></pre>
+      </section>
+    </main>
+
+    <footer class="footer">
+      <p>
+        MIT-licensed React calendar time picker ·{" "}
+        <a href={NPM_URL} target="_blank" rel="noreferrer">
+          react-calendar-time on npm
+        </a>{" "}
+        ·{" "}
+        <a href={GITHUB_URL} target="_blank" rel="noreferrer">
+          Source on GitHub
+        </a>
+      </p>
+    </footer>
+  </div>
+</BaseLayout>

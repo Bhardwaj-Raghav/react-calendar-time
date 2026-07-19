@@ -1,18 +1,100 @@
 {
-  "name": "react-datetime-picker-component",
-  "version": "0.1.3",
-  "description": "Custom React component for Date time Picker",
-  "main": "index.jsx",
-  "repository": "https://github.com/Bhardwaj-Raghav/react-datetime-picker-component",
-  "private": false,
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "Raghav Bhardwaj",
+  "name": "react-calendar-time",
+  "version": "1.0.0",
+  "description": "Accessible React date and time picker component",
   "license": "MIT",
+  "author": "Raghav Bhardwaj",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/Bhardwaj-Raghav/react-datetime-picker-component.git"
+  },
+  "homepage": "https://react-calendar-time.vercel.app",
+  "bugs": {
+    "url": "https://github.com/Bhardwaj-Raghav/react-datetime-picker-component/issues"
+  },
+  "keywords": [
+    "react",
+    "datepicker",
+    "datetime",
+    "timepicker",
+    "calendar",
+    "date-time-picker"
+  ],
+  "sideEffects": [
+    "**/*.css"
+  ],
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/index.js",
+  "module": "./dist/index.mjs",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.mjs",
+      "require": "./dist/index.js"
+    },
+    "./style.css": "./dist/style.css",
+    "./package.json": "./package.json"
+  },
+  "scripts": {
+    "build": "tsup && npm run build:css",
+    "build:css": "sass src/styles/datepicker.scss dist/style.css --style=compressed --no-source-map",
+    "dev": "vite --config playground/vite.config.ts",
+    "website": "astro dev --root website --port 5174",
+    "website:build": "astro build --root website",
+    "screenshots": "node scripts/capture-screenshots.mjs",
+    "typecheck": "tsc --noEmit",
+    "lint": "eslint .",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "storybook": "storybook dev -p 6006",
+    "build-storybook": "storybook build",
+    "prepublishOnly": "npm run typecheck && npm run test && npm run build"
+  },
+  "peerDependencies": {
+    "react": ">=17.0.0",
+    "react-dom": ">=17.0.0"
+  },
   "dependencies": {
-    "moment": "^2.29.3",
-    "prop-types": "^15.8.1",
-    "react": "^18.2.0"
+    "dayjs": "^1.11.13"
+  },
+  "devDependencies": {
+    "@astrojs/react": "^6.0.1",
+    "@astrojs/sitemap": "^3.7.3",
+    "@eslint/js": "^9.21.0",
+    "@storybook/addon-docs": "^10.5.2",
+    "@storybook/react": "^10.5.2",
+    "@storybook/react-vite": "^10.5.2",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.2.0",
+    "@testing-library/user-event": "^14.6.1",
+    "@types/mime-types": "^3.0.1",
+    "@types/react": "^18.3.18",
+    "@types/react-dom": "^18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "astro": "^7.1.1",
+    "eslint": "^9.21.0",
+    "eslint-plugin-react-hooks": "^5.1.0",
+    "eslint-plugin-storybook": "10.5.2",
+    "globals": "^15.15.0",
+    "jsdom": "^26.0.0",
+    "mime-types": "^3.0.2",
+    "playwright": "^1.61.1",
+    "prettier": "^3.5.2",
+    "react": "^18.3.1",
+    "react-dom": "^18.3.1",
+    "sass": "^1.85.0",
+    "sharp": "^0.35.3",
+    "storybook": "^10.5.2",
+    "tsup": "^8.3.6",
+    "typescript": "^5.7.3",
+    "typescript-eslint": "^8.24.1",
+    "vite": "^6.1.0",
+    "vitest": "^3.0.5"
+  },
+  "engines": {
+    "node": ">=18"
   }
 }
