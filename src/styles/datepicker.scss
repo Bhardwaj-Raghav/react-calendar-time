@@ -1,0 +1,316 @@
+:root {
+  --ctp-primary: #9ccc65;
+  --ctp-primary-dark: #689f38;
+  --ctp-primary-alt: #6ccf4e;
+  --ctp-surface: #f7f7f7;
+  --ctp-muted: #e5e5e5;
+  --ctp-muted-text: #919191;
+  --ctp-weekend: #c4c4c4;
+  --ctp-disabled: #888888;
+  --ctp-danger: #f44336;
+  --ctp-overlay: rgba(0, 0, 0, 0.4);
+  --ctp-shadow: #dedede;
+  --ctp-border-radius: 10px;
+  --ctp-width: 300px;
+  --ctp-font-size: 14px;
+  --ctp-range-bg: color-mix(in srgb, var(--ctp-primary) 35%, white);
+}
+
+.ctp-calendar-time-picker-absolute-container {
+  position: fixed;
+  inset: 0;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  background-color: var(--ctp-overlay);
+  overflow: auto;
+  z-index: 99999;
+}
+
+.ctp-input-root {
+  display: inline-flex;
+  flex-direction: column;
+  gap: 4px;
+}
+
+.ctp-input {
+  font: inherit;
+  padding: 8px 12px;
+  border: 1px solid var(--ctp-primary);
+  border-radius: 6px;
+  min-width: 220px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.ctp-input:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.ctp-calendar-time-picker {
+  width: var(--ctp-width);
+  background-color: var(--ctp-surface);
+  font-size: var(--ctp-font-size);
+  border: 1px solid var(--ctp-primary);
+  box-shadow: 0 4px 10px 2px var(--ctp-shadow);
+  border-radius: var(--ctp-border-radius);
+  z-index: 100000;
+}
+
+.ctp-header {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 15px;
+  border-bottom: 3px solid var(--ctp-primary);
+}
+
+.ctp-range-title {
+  font-weight: 600;
+  color: var(--ctp-primary-dark);
+}
+
+.ctp-button-container {
+  display: flex;
+}
+
+.ctp-button-container > * {
+  padding: 5px 20px;
+  border-radius: 8px;
+  background-color: var(--ctp-muted);
+  color: var(--ctp-muted-text);
+  z-index: 0;
+  position: relative;
+  cursor: pointer;
+  display: inline-block;
+  border: none;
+  font: inherit;
+}
+
+.ctp-button-container > *.ctp-active {
+  background-color: var(--ctp-primary);
+  color: #fff;
+  z-index: 1;
+}
+
+.ctp-date.ctp-active {
+  margin-right: -10px;
+}
+
+.ctp-time.ctp-active {
+  margin-left: -10px;
+}
+
+.ctp-body .ctp-month-year {
+  display: flex;
+  justify-content: space-evenly;
+  align-items: center;
+  color: var(--ctp-primary);
+}
+
+.ctp-prev-month,
+.ctp-next-month {
+  cursor: pointer;
+  padding: 5px 10px;
+  background: transparent;
+  border: none;
+  color: inherit;
+  font-size: 1.25rem;
+  line-height: 1;
+}
+
+.ctp-main-calendar {
+  display: grid;
+  gap: 10px;
+  grid-template-columns: repeat(7, 1fr);
+  padding: 10px 20px;
+}
+
+.ctp-main-calendar .ctp-box {
+  text-align: center;
+}
+
+.ctp-box-days {
+  color: var(--ctp-primary);
+  font-size: 0.85em;
+}
+
+.ctp-box-date {
+  padding: 5px;
+  border-radius: 5px;
+  background-color: var(--ctp-muted);
+  border: none;
+  font: inherit;
+  color: inherit;
+}
+
+.ctp-box-date:not(.not-current-month):not(.disabled-date):not(:disabled) {
+  cursor: pointer;
+}
+
+.ctp-box-date.weekend-day {
+  background-color: var(--ctp-weekend);
+}
+
+.ctp-box-date.selected,
+.ctp-box-date.ctp-range-start,
+.ctp-box-date.ctp-range-end {
+  background-color: var(--ctp-primary-dark);
+  color: white;
+}
+
+.ctp-box-date.ctp-in-range {
+  background-color: var(--ctp-range-bg);
+}
+
+.ctp-box-date.ctp-today:not(.selected) {
+  outline: 1px solid var(--ctp-primary-dark);
+}
+
+.ctp-box-date.not-current-month {
+  cursor: not-allowed;
+  color: #c8efb8;
+  background-color: transparent;
+}
+
+.ctp-box-date.disabled-date:not(.not-current-month),
+.ctp-box-date:disabled:not(.not-current-month) {
+  cursor: not-allowed;
+  background-color: var(--ctp-disabled);
+  color: #eee;
+}
+
+.ctp-main-time {
+  height: 250px;
+  position: relative;
+}
+
+.ctp-main-time-header,
+.ctp-main-time-body {
+  display: grid;
+  gap: 10px;
+  grid-template-rows: 30px;
+  grid-template-columns: repeat(3, 30px);
+  padding: 10px 0;
+  width: 120px;
+  margin: auto;
+}
+
+.ctp-main-time-header .ctp-box,
+.ctp-main-time-body .ctp-box {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.ctp-box-time.not-opened .ctp-hour,
+.ctp-box-time.not-opened .ctp-minute,
+.ctp-box-time.not-opened .ctp-second,
+.ctp-box-time.not-opened .ctp-am-pm {
+  background-color: var(--ctp-primary-dark);
+  color: white;
+}
+
+.ctp-box-time {
+  position: relative;
+}
+
+.ctp-box-time .ctp-initial-time {
+  display: none;
+  border: none;
+  font: inherit;
+  padding: 5px;
+  border-radius: 5px;
+  cursor: pointer;
+}
+
+.ctp-box-time.not-opened .ctp-initial-time {
+  display: block;
+}
+
+.ctp-overflow-hours,
+.ctp-overflow-minutes,
+.ctp-overflow-seconds,
+.ctp-overflow-am-pm {
+  max-height: 170px;
+  overflow: auto;
+  position: absolute;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 10px;
+  margin-top: -23px;
+  border-top: 1px solid #dddddd;
+  border-bottom: 1px solid #dddddd;
+  z-index: 2;
+  background: var(--ctp-surface);
+}
+
+.ctp-overflow-hours::-webkit-scrollbar,
+.ctp-overflow-minutes::-webkit-scrollbar,
+.ctp-overflow-seconds::-webkit-scrollbar,
+.ctp-overflow-am-pm::-webkit-scrollbar {
+  width: 0;
+}
+
+.ctp-overflow-hours.not-visible,
+.ctp-overflow-minutes.not-visible,
+.ctp-overflow-seconds.not-visible,
+.ctp-overflow-am-pm.not-visible {
+  display: none;
+}
+
+.ctp-hour,
+.ctp-minute,
+.ctp-second,
+.ctp-am-pm {
+  cursor: pointer;
+  padding: 5px;
+  border-radius: 5px;
+  background-color: var(--ctp-muted);
+  border: none;
+  font: inherit;
+}
+
+.ctp-main-time-body {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  margin-top: 15px;
+  transform: translate(-50%, -50%);
+}
+
+.ctp-footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px;
+  gap: 8px;
+  border-top: 3px solid var(--ctp-primary-alt);
+}
+
+.ctp-footer button {
+  background-color: var(--ctp-primary);
+  color: white;
+  border: none;
+  padding: 5px 12px;
+  font-weight: bold;
+  border-radius: 5px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.ctp-footer button:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.ctp-footer button.close-button {
+  background-color: var(--ctp-danger);
+}
+
+.ctp-footer button.ctp-cancel {
+  background-color: #757575;
+  margin-left: auto;
+}

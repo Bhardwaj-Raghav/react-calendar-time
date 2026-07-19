@@ -1,0 +1,6 @@
+{
+  "buildCommand": "npm run website:build",
+  "outputDirectory": "site-dist",
+  "framework": null,
+  "rewrites": [{ "source": "/(.*)", "destination": "/index.html" }]
+}
