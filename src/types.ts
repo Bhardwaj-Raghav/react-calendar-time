@@ -1,9 +1,47 @@
 import type { Dayjs } from "dayjs";
-import type { CSSProperties, ReactNode } from "react";
+import type { CSSProperties } from "react";
 
 export type DateTimeMode = "datetime" | "date" | "time";
 
+/**
+ * How date and time panels are arranged when `mode="datetime"`.
+ * - `combined` (default): both panels visible at once (no Date/Time tabs)
+ * - `tabs`: separate Date / Time tabs (legacy layout)
+ */
+export type DateTimeLayout = "combined" | "tabs";
+
 export type DateTimeValue = Date | string | Dayjs | null;
+
+/** Optional chrome strings for UI labels (not a full i18n suite). */
+export interface DateTimeLabels {
+  date?: string;
+  time?: string;
+  clear?: string;
+  close?: string;
+  ok?: string;
+  start?: string;
+  end?: string;
+  chooseDate?: string;
+  chooseDateRange?: string;
+  previousMonth?: string;
+  nextMonth?: string;
+  selectEnd?: string;
+}
+
+export const DEFAULT_LABELS: Required<DateTimeLabels> = {
+  date: "Date",
+  time: "Time",
+  clear: "Clear",
+  close: "Close",
+  ok: "OK",
+  start: "Start",
+  end: "End",
+  chooseDate: "Choose date",
+  chooseDateRange: "Choose date range",
+  previousMonth: "Previous month",
+  nextMonth: "Next month",
+  selectEnd: "Select end date",
+};
 
 export interface DateTimeBaseProps {
   /** Controlled value. Accepts Date, dayjs, formatted string, or null. */
@@ -16,6 +54,12 @@ export interface DateTimeBaseProps {
   format?: string;
   /** Picker mode. Default: `datetime` */
   mode?: DateTimeMode;
+  /**
+   * Date/time panel arrangement when `mode="datetime"`.
+   * Default: `combined`. Use `tabs` for the classic Date | Time switcher.
+   * Ignored when `mode` is `date` or `time` (tabs are never shown).
+   */
+  layout?: DateTimeLayout;
   minDate?: DateTimeValue;
   maxDate?: DateTimeValue;
   disablePastDates?: boolean;
@@ -30,6 +74,14 @@ export interface DateTimeBaseProps {
   style?: CSSProperties;
   /** Locale code passed to dayjs (e.g. `en`, `fr`). Default: `en` */
   locale?: string;
+  /** Override chrome strings (Date/Time/OK/Clear/…). */
+  labels?: DateTimeLabels;
+  /**
+   * Color theme. Prefer wrapping with `data-ctp-theme="dark"` for inline pickers.
+   * For portaled popovers/overlays, pass `theme` or place `data-ctp-theme` on an
+   * ancestor of the input — the picker copies it onto the portal root.
+   */
+  theme?: "light" | "dark";
 }
 
 export interface DateTimeProps extends DateTimeBaseProps {
@@ -62,17 +114,24 @@ export interface DateRangeValue {
   end: string | null;
 }
 
-export interface DateTimeRangeProps
-  extends Omit<DateTimeBaseProps, "value" | "defaultValue" | "onChange" | "mode"> {
+export interface DateTimeRangeProps {
   value?: { start: DateTimeValue; end: DateTimeValue } | null;
   defaultValue?: { start: DateTimeValue; end: DateTimeValue } | null;
   onChange?: (value: DateRangeValue) => void;
+  format?: string;
+  minDate?: DateTimeValue;
+  maxDate?: DateTimeValue;
+  disablePastDates?: boolean;
+  disableFutureDates?: boolean;
+  weekStartsOn?: 0 | 1 | 2 | 3 | 4 | 5 | 6;
+  locale?: string;
+  labels?: DateTimeLabels;
   open?: boolean;
   defaultOpen?: boolean;
   onOpenChange?: (open: boolean) => void;
   inline?: boolean;
   className?: string;
-  children?: ReactNode;
+  style?: CSSProperties;
 }
 
 export interface CalendarDay {

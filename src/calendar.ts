@@ -12,6 +12,8 @@ export interface BuildCalendarOptions {
   selected?: Dayjs | null;
   rangeStart?: Dayjs | null;
   rangeEnd?: Dayjs | null;
+  /** Tentative end for hover preview while selecting a range. */
+  hoverEnd?: Dayjs | null;
   minDate?: DateTimeValue;
   maxDate?: DateTimeValue;
   disablePastDates?: boolean;
@@ -76,13 +78,19 @@ export function buildCalendarMonth(
       const isRangeEnd = Boolean(
         options.rangeEnd && date.isSame(options.rangeEnd, "day")
       );
+      const effectiveEnd = options.rangeEnd ?? options.hoverEnd ?? null;
       let isInRange = false;
-      if (options.rangeStart && options.rangeEnd) {
+      if (options.rangeStart && effectiveEnd) {
+        const rangeLow = options.rangeStart.isBefore(effectiveEnd, "day")
+          ? options.rangeStart
+          : effectiveEnd;
+        const rangeHigh = options.rangeStart.isBefore(effectiveEnd, "day")
+          ? effectiveEnd
+          : options.rangeStart;
         isInRange =
-          (date.isAfter(options.rangeStart, "day") &&
-            date.isBefore(options.rangeEnd, "day")) ||
-          isRangeStart ||
-          isRangeEnd;
+          (date.isAfter(rangeLow, "day") && date.isBefore(rangeHigh, "day")) ||
+          date.isSame(rangeLow, "day") ||
+          date.isSame(rangeHigh, "day");
       }
 
       week.push({

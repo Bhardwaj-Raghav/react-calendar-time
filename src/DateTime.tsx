@@ -12,20 +12,24 @@ import { createPortal } from "react-dom";
 import { buildCalendarMonth } from "./calendar";
 import {
   useFocusTrap,
+  useOnClickOutside,
   useOnEscape,
   usePopoverPosition,
 } from "./hooks/useA11y";
 import { useControllableState } from "./hooks/useControllableState";
-import type { DateTimeProps } from "./types";
+import { DEFAULT_LABELS, type DateTimeProps } from "./types";
 import {
   DEFAULT_FORMAT,
   HOURS_12,
   HOURS_24,
   MINUTES,
   dayjs,
+  endOfWeek,
+  formatLocalized,
   formatValue,
   getWeekdayLabels,
   parseValue,
+  startOfWeek,
   to12Hour,
   to24Hour,
   type Dayjs,
@@ -35,6 +39,31 @@ function cx(...parts: Array<string | false | null | undefined>): string {
   return parts.filter(Boolean).join(" ");
 }
 
+/** Resolve theme for portaled pickers (CSS vars don't cross portals). */
+function resolveThemeAttr(
+  theme: "light" | "dark" | undefined,
+  anchorEl: HTMLElement | null | undefined
+): "light" | "dark" | undefined {
+  if (theme === "light" || theme === "dark") {
+    return theme;
+  }
+  let node: HTMLElement | null | undefined = anchorEl ?? null;
+  while (node) {
+    const attr = node.getAttribute("data-ctp-theme");
+    if (attr === "dark" || attr === "light") {
+      return attr;
+    }
+    node = node.parentElement;
+  }
+  if (typeof document !== "undefined") {
+    const root = document.documentElement.getAttribute("data-ctp-theme");
+    if (root === "dark" || root === "light") {
+      return root;
+    }
+  }
+  return undefined;
+}
+
 export function DateTime(props: DateTimeProps) {
   const {
     value,
@@ -42,6 +71,7 @@ export function DateTime(props: DateTimeProps) {
     onChange,
     format = DEFAULT_FORMAT,
     mode = "datetime",
+    layout = "combined",
     minDate,
     maxDate,
     disablePastDates = false,
@@ -52,12 +82,19 @@ export function DateTime(props: DateTimeProps) {
     className,
     style,
     locale = "en",
+    labels: labelsProp,
+    theme,
     open: openProp,
     defaultOpen = true,
     onOpenChange,
     anchorEl,
     popover = false,
   } = props;
+
+  const labels = useMemo(
+    () => ({ ...DEFAULT_LABELS, ...labelsProp }),
+    [labelsProp]
+  );
 
   const titleId = useId();
   const dialogRef = useRef<HTMLDivElement>(null);
@@ -82,6 +119,13 @@ export function DateTime(props: DateTimeProps) {
   });
 
   useEffect(() => {
+    if (value === null) {
+      const fallback = dayjs();
+      setDraft(fallback);
+      setViewMonth(fallback.startOf("month"));
+      setFocusedDay(fallback);
+      return;
+    }
     const parsed = parseValue(value ?? null, format);
     if (parsed) {
       setDraft(parsed);
@@ -112,8 +156,14 @@ export function DateTime(props: DateTimeProps) {
 
   useOnEscape(close, open && !inline);
   useFocusTrap(dialogRef, open && !inline);
+  useOnClickOutside(close, open && !inline && popover, dialogRef, anchorEl);
 
-  const position = usePopoverPosition(anchorEl, open && !inline, popover);
+  const position = usePopoverPosition(
+    anchorEl,
+    open && !inline,
+    popover,
+    dialogRef
+  );
 
   const weeks = useMemo(
     () =>
@@ -142,25 +192,16 @@ export function DateTime(props: DateTimeProps) {
     [locale, weekStartsOn]
   );
 
-  const selectDay = useCallback(
-    (day: Dayjs) => {
-      setDraft((prev) =>
-        prev
-          .year(day.year())
-          .month(day.month())
-          .date(day.date())
-      );
-      setFocusedDay(day);
-    },
-    []
-  );
+  const selectDay = useCallback((day: Dayjs) => {
+    setDraft((prev) =>
+      prev.year(day.year()).month(day.month()).date(day.date())
+    );
+    setFocusedDay(day);
+  }, []);
 
-  const setHour = useCallback(
-    (hourValue: number) => {
-      setDraft((prev) => prev.hour(hourValue));
-    },
-    []
-  );
+  const setHour = useCallback((hourValue: number) => {
+    setDraft((prev) => prev.hour(hourValue));
+  }, []);
 
   const setMinute = useCallback((minute: number) => {
     setDraft((prev) => prev.minute(minute));
@@ -186,10 +227,10 @@ export function DateTime(props: DateTimeProps) {
         next = focusedDay.add(7, "day");
         break;
       case "Home":
-        next = focusedDay.startOf("week");
+        next = startOfWeek(focusedDay, weekStartsOn);
         break;
       case "End":
-        next = focusedDay.endOf("week");
+        next = endOfWeek(focusedDay, weekStartsOn);
         break;
       case "PageUp":
         next = focusedDay.subtract(1, "month");
@@ -202,9 +243,7 @@ export function DateTime(props: DateTimeProps) {
       case "Enter":
       case " ": {
         event.preventDefault();
-        const cell = weeks
-          .flat()
-          .find((d) => d.date.isSame(focusedDay, "day"));
+        const cell = weeks.flat().find((d) => d.date.isSame(focusedDay, "day"));
         if (cell && !cell.isDisabled && cell.isCurrentMonth) {
           selectDay(cell.date);
         }
@@ -235,28 +274,208 @@ export function DateTime(props: DateTimeProps) {
     return null;
   }
 
+  const showDate = mode !== "time";
+  const showTime = mode !== "date";
+  const useTabs = mode === "datetime" && layout === "tabs";
+  const showDatePanel = showDate && (!useTabs || tab === "date");
+  const showTimePanel = showTime && (!useTabs || tab === "time");
+  const showModeTabs = useTabs;
+  const themeAttr = resolveThemeAttr(theme, anchorEl);
+
   const pickerStyle =
     popover && !inline
       ? {
           ...style,
-          position: "absolute" as const,
+          position: "fixed" as const,
           top: position?.top ?? 80,
           left: position?.left ?? 16,
         }
       : style;
 
+  const datePanel = (
+    <div className="ctp-body ctp-body-calendar-date">
+      <div className="ctp-month-year">
+        <button
+          type="button"
+          className="ctp-prev-month"
+          aria-label={labels.previousMonth}
+          onClick={() => setViewMonth((m) => m.subtract(1, "month"))}
+        >
+          ‹
+        </button>
+        <span
+          className="ctp-current-month"
+          id={showDatePanel ? titleId : undefined}
+        >
+          {formatLocalized(viewMonth, "MMMM YYYY", locale)}
+        </span>
+        <button
+          type="button"
+          className="ctp-next-month"
+          aria-label={labels.nextMonth}
+          onClick={() => setViewMonth((m) => m.add(1, "month"))}
+        >
+          ›
+        </button>
+      </div>
+      <div
+        className="ctp-main-calendar"
+        role="grid"
+        aria-label={labels.chooseDate}
+        tabIndex={0}
+        onKeyDown={onGridKeyDown}
+      >
+        {weekdayLabels.map((label) => (
+          <div
+            key={label}
+            className="ctp-box ctp-box-days"
+            role="columnheader"
+          >
+            {label}
+          </div>
+        ))}
+        {weeks.map((week) =>
+          week.map((dayData) => {
+            const selected = dayData.isSelected;
+            const focused = dayData.date.isSame(focusedDay, "day");
+            const disabled = !dayData.isCurrentMonth || dayData.isDisabled;
+            return (
+              <button
+                key={dayData.date.format("YYYY-MM-DD")}
+                type="button"
+                role="gridcell"
+                tabIndex={focused ? 0 : -1}
+                aria-selected={selected}
+                aria-disabled={disabled}
+                disabled={disabled}
+                aria-label={formatLocalized(
+                  dayData.date,
+                  "dddd, MMMM D, YYYY",
+                  locale
+                )}
+                className={cx(
+                  "ctp-box",
+                  "ctp-box-date",
+                  !dayData.isCurrentMonth && "not-current-month",
+                  selected && "selected",
+                  dayData.isDisabled && "disabled-date",
+                  dayData.isWeekend && "weekend-day",
+                  dayData.isCurrentDate && "ctp-today",
+                  dayData.isInRange && "ctp-in-range",
+                  dayData.isRangeStart && "ctp-range-start",
+                  dayData.isRangeEnd && "ctp-range-end"
+                )}
+                onClick={() => {
+                  if (!disabled) {
+                    selectDay(dayData.date);
+                  }
+                }}
+              >
+                {dayData.date.format("D")}
+              </button>
+            );
+          })
+        )}
+      </div>
+    </div>
+  );
+
+  const timePanel = (
+    <div className="ctp-body ctp-body-calendar-time">
+      {showDatePanel && (
+        <div className="ctp-section-label">{labels.time}</div>
+      )}
+      {!showDatePanel && (
+        <span className="ctp-visually-hidden" id={titleId}>
+          {labels.time}
+        </span>
+      )}
+      <div className="ctp-main-time">
+        <div className="ctp-main-time-header">
+          <div className="ctp-box">Hr</div>
+          <div className="ctp-box">Min</div>
+          <div className="ctp-box">Sec</div>
+          {use12Hours && <div className="ctp-box">AM/PM</div>}
+        </div>
+        <div className="ctp-main-time-body">
+          <TimeColumn
+            label="hours"
+            open={showHours}
+            onToggle={() => setShowHours((v) => !v)}
+            display={displayHour}
+            options={hourOptions}
+            onSelect={(opt) => {
+              if (use12Hours) {
+                setHour(to24Hour(Number(opt), isAm));
+              } else {
+                setHour(Number(opt));
+              }
+              setShowHours(false);
+            }}
+          />
+          <TimeColumn
+            label="minutes"
+            open={showMinutes}
+            onToggle={() => setShowMinutes((v) => !v)}
+            display={padDisplay(draft.minute())}
+            options={MINUTES}
+            onSelect={(opt) => {
+              setMinute(Number(opt));
+              setShowMinutes(false);
+            }}
+          />
+          <TimeColumn
+            label="seconds"
+            open={showSeconds}
+            onToggle={() => setShowSeconds((v) => !v)}
+            display={padDisplay(draft.second())}
+            options={MINUTES}
+            onSelect={(opt) => {
+              setSecond(Number(opt));
+              setShowSeconds(false);
+            }}
+          />
+          {use12Hours && (
+            <TimeColumn
+              label="am-pm"
+              open={showAmPm}
+              onToggle={() => setShowAmPm((v) => !v)}
+              display={isAm ? "AM" : "PM"}
+              options={["AM", "PM"]}
+              onSelect={(opt) => {
+                setHour(to24Hour(hour12, opt === "AM"));
+                setShowAmPm(false);
+              }}
+            />
+          )}
+        </div>
+      </div>
+    </div>
+  );
+
   const picker = (
     <div
       ref={dialogRef}
-      className={cx("ctp-calendar-time-picker", className)}
+      className={cx(
+        "ctp-calendar-time-picker",
+        popover && !inline && "ctp-popover",
+        use12Hours && "ctp-use-12h",
+        showDatePanel && showTimePanel && "ctp-layout-combined",
+        className
+      )}
       style={pickerStyle}
+      data-ctp-theme={themeAttr}
       role={inline ? undefined : "dialog"}
       aria-modal={inline ? undefined : true}
       aria-labelledby={titleId}
     >
-      <div className="ctp-header">
-        <div className="ctp-button-container" role="tablist" aria-label="Picker mode">
-          {mode !== "time" && (
+      {showModeTabs && (
+        <div className="ctp-header">
+          <div
+            className="ctp-button-container"
+            role="tablist"
+            aria-label="Picker mode"
+          >
             <button
               type="button"
               role="tab"
@@ -264,10 +483,8 @@ export function DateTime(props: DateTimeProps) {
               className={cx("ctp-date", tab === "date" && "ctp-active")}
               onClick={() => setTab("date")}
             >
-              Date
+              {labels.date}
             </button>
-          )}
-          {mode !== "date" && (
             <button
               type="button"
               role="tab"
@@ -275,169 +492,24 @@ export function DateTime(props: DateTimeProps) {
               className={cx("ctp-time", tab === "time" && "ctp-active")}
               onClick={() => setTab("time")}
             >
-              Time
+              {labels.time}
             </button>
-          )}
-        </div>
-      </div>
-
-      {tab === "date" && mode !== "time" ? (
-        <div className="ctp-body ctp-body-calendar-date">
-          <div className="ctp-month-year">
-            <button
-              type="button"
-              className="ctp-prev-month"
-              aria-label="Previous month"
-              onClick={() => setViewMonth((m) => m.subtract(1, "month"))}
-            >
-              ‹
-            </button>
-            <span className="ctp-current-month" id={titleId}>
-              {viewMonth.format("MMMM YYYY")}
-            </span>
-            <button
-              type="button"
-              className="ctp-next-month"
-              aria-label="Next month"
-              onClick={() => setViewMonth((m) => m.add(1, "month"))}
-            >
-              ›
-            </button>
-          </div>
-          <div
-            className="ctp-main-calendar"
-            role="grid"
-            aria-label="Choose date"
-            tabIndex={0}
-            onKeyDown={onGridKeyDown}
-          >
-            {weekdayLabels.map((label) => (
-              <div key={label} className="ctp-box ctp-box-days" role="columnheader">
-                {label}
-              </div>
-            ))}
-            {weeks.map((week) =>
-              week.map((dayData) => {
-                const selected = dayData.isSelected;
-                const focused = dayData.date.isSame(focusedDay, "day");
-                const disabled =
-                  !dayData.isCurrentMonth || dayData.isDisabled;
-                return (
-                  <button
-                    key={dayData.date.format("YYYY-MM-DD")}
-                    type="button"
-                    role="gridcell"
-                    tabIndex={focused ? 0 : -1}
-                    aria-selected={selected}
-                    aria-disabled={disabled}
-                    disabled={disabled}
-                    aria-label={dayData.date.format("dddd, MMMM D, YYYY")}
-                    className={cx(
-                      "ctp-box",
-                      "ctp-box-date",
-                      !dayData.isCurrentMonth && "not-current-month",
-                      selected && "selected",
-                      dayData.isDisabled && "disabled-date",
-                      dayData.isWeekend && "weekend-day",
-                      dayData.isCurrentDate && "ctp-today",
-                      dayData.isInRange && "ctp-in-range",
-                      dayData.isRangeStart && "ctp-range-start",
-                      dayData.isRangeEnd && "ctp-range-end"
-                    )}
-                    onClick={() => {
-                      if (!disabled) {
-                        selectDay(dayData.date);
-                      }
-                    }}
-                  >
-                    {dayData.date.format("D")}
-                  </button>
-                );
-              })
-            )}
-          </div>
-        </div>
-      ) : (
-        <div className="ctp-body ctp-body-calendar-time">
-          <div className="ctp-main-time">
-            <div className="ctp-main-time-header">
-              <div className="ctp-box">Hr</div>
-              <div className="ctp-box">Min</div>
-              <div className="ctp-box">Sec</div>
-              {use12Hours && <div className="ctp-box">AM/PM</div>}
-            </div>
-            <div
-              className="ctp-main-time-body"
-              style={
-                use12Hours
-                  ? { gridTemplateColumns: "repeat(4, 30px)", width: "160px" }
-                  : undefined
-              }
-            >
-              <TimeColumn
-                label="hours"
-                open={showHours}
-                onToggle={() => setShowHours((v) => !v)}
-                display={displayHour}
-                options={hourOptions}
-                onSelect={(opt) => {
-                  if (use12Hours) {
-                    setHour(to24Hour(Number(opt), isAm));
-                  } else {
-                    setHour(Number(opt));
-                  }
-                  setShowHours(false);
-                }}
-              />
-              <TimeColumn
-                label="minutes"
-                open={showMinutes}
-                onToggle={() => setShowMinutes((v) => !v)}
-                display={padDisplay(draft.minute())}
-                options={MINUTES}
-                onSelect={(opt) => {
-                  setMinute(Number(opt));
-                  setShowMinutes(false);
-                }}
-              />
-              <TimeColumn
-                label="seconds"
-                open={showSeconds}
-                onToggle={() => setShowSeconds((v) => !v)}
-                display={padDisplay(draft.second())}
-                options={MINUTES}
-                onSelect={(opt) => {
-                  setSecond(Number(opt));
-                  setShowSeconds(false);
-                }}
-              />
-              {use12Hours && (
-                <TimeColumn
-                  label="am-pm"
-                  open={showAmPm}
-                  onToggle={() => setShowAmPm((v) => !v)}
-                  display={isAm ? "AM" : "PM"}
-                  options={["AM", "PM"]}
-                  onSelect={(opt) => {
-                    setHour(to24Hour(hour12, opt === "AM"));
-                    setShowAmPm(false);
-                  }}
-                />
-              )}
-            </div>
           </div>
         </div>
       )}
 
+      {showDatePanel && datePanel}
+      {showTimePanel && timePanel}
+
       <div className="ctp-footer">
         <button type="button" className="close-button" onClick={clearAndClose}>
-          Clear
+          {labels.clear}
         </button>
         <button type="button" className="ctp-cancel" onClick={close}>
-          Close
+          {labels.close}
         </button>
         <button type="button" onClick={confirm}>
-          OK
+          {labels.ok}
         </button>
       </div>
     </div>
@@ -454,6 +526,7 @@ export function DateTime(props: DateTimeProps) {
   return createPortal(
     <div
       className="ctp-calendar-time-picker-absolute-container"
+      data-ctp-theme={themeAttr}
       onClick={onBackdropClick}
     >
       {picker}

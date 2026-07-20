@@ -334,6 +334,26 @@ a {
   font-weight: 600;
 }
 
+.showcase-block .stage-value {
+  margin-top: 0.75rem;
+}
+
+.showcase-block .ctp-input-root {
+  margin-top: 0.75rem;
+}
+
+.showcase-block--dark {
+  padding: 1.1rem 1.15rem 1.25rem;
+  border-radius: 1rem;
+  background: #111827;
+  color: #f3f4f6;
+}
+
+.showcase-block--dark h3,
+.showcase-block--dark .stage-value {
+  color: #e5e7eb;
+}
+
 .snippet {
   max-width: 1120px;
   margin: 0 auto;

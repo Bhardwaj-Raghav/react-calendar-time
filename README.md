@@ -65,12 +65,15 @@ function App() {
 | `onChange` | `(value: string \| null) => void` | — | Fired on OK / Clear |
 | `format` | `string` | `YYYY-MM-DD HH:mm:ss` | dayjs format |
 | `mode` | `"datetime" \| "date" \| "time"` | `"datetime"` | Picker mode |
+| `layout` | `"combined" \| "tabs"` | `"combined"` | When `mode="datetime"`: show both panels, or Date/Time tabs. Hidden for date-only / time-only |
 | `minDate` / `maxDate` | date-like | — | Inclusive bounds |
 | `disablePastDates` | `boolean` | `false` | Disable days before today |
 | `disableFutureDates` | `boolean` | `false` | Disable days after today |
 | `weekStartsOn` | `0–6` | `0` | First day of week (0 = Sunday) |
 | `use12Hours` | `boolean` | `false` | 12-hour clock with AM/PM |
 | `locale` | `string` | `"en"` | dayjs locale (import locale first) |
+| `labels` | `DateTimeLabels` | English defaults | Override chrome strings |
+| `theme` | `"light" \| "dark"` | — | Force theme (useful for portaled popovers) |
 | `inline` | `boolean` | `false` | Render without overlay |
 | `className` | `string` | — | Root class |
 
@@ -83,28 +86,88 @@ function App() {
 | `popover` | `boolean` | Position near `anchorEl` instead of fullscreen |
 | `anchorEl` | `HTMLElement \| null` | Anchor for popover |
 
+`DateTimeInput` always uses popover mode. The popover uses `position: fixed`, flips above the input when needed, repositions on scroll/resize, and closes on outside click or Escape.
+
 ### `DateTimeInput` extras
 
 `placeholder`, `id`, `name`, `disabled`, `readOnly`, `aria-label`, `aria-labelledby`, `inputClassName`
 
 ### `DateTimeRange`
 
-`onChange` receives `{ start: string | null; end: string | null }`.
+`onChange` receives `{ start: string | null; end: string | null }`. Supports keyboard grid navigation, hover range preview, and the same `locale` / `weekStartsOn` / `labels` props.
+
+### Labels
+
+```tsx
+<DateTime
+  inline
+  labels={{ ok: "Confirm", clear: "Wipe", close: "Dismiss", date: "Jour" }}
+/>
+```
+
+### Layout
+
+By default (`layout="combined"`), datetime mode shows the calendar and time controls together — no Date/Time badges. Use `layout="tabs"` for the classic switcher. When `mode` is `"date"` or `"time"`, the badges are never shown.
+
+```tsx
+{/* Default: both panels */}
+<DateTime inline mode="datetime" onChange={setValue} />
+
+{/* Classic tabs */}
+<DateTime inline mode="datetime" layout="tabs" onChange={setValue} />
+
+{/* Date only — no badges */}
+<DateTime inline mode="date" onChange={setValue} />
+```
+
+## 12-hour clock
+
+`use12Hours` only changes the time UI. Pair it with a 12-hour `format` so the input/value match what users see:
+
+```tsx
+<DateTimeInput
+  use12Hours
+  format="YYYY-MM-DD hh:mm:ss A"
+  value={value}
+  onChange={setValue}
+/>
+```
 
 ## Theming
 
-Override CSS variables:
+Override CSS variables (light defaults shown):
 
 ```css
 :root {
-  --ctp-primary: #9ccc65;
-  --ctp-primary-dark: #689f38;
-  --ctp-surface: #f7f7f7;
-  --ctp-danger: #f44336;
+  --ctp-primary: #7cb342;
+  --ctp-primary-dark: #558b2f;
+  --ctp-surface: #ffffff;
+  --ctp-fg: #1f2937;
+  --ctp-border: #e5e7eb;
+  --ctp-focus: #7cb342;
+  --ctp-danger: #dc2626;
+  --ctp-z-index: 1000;
 }
 ```
 
+### Dark theme
+
+Wrap the picker (or a parent) with `data-ctp-theme="dark"`:
+
+```tsx
+<div data-ctp-theme="dark">
+  <DateTime inline mode="time" onChange={setValue} />
+  <DateTimeInput mode="time" onChange={setValue} />
+</div>
+```
+
+Inline pickers inherit theme from the wrapper. Portaled popovers/overlays copy `data-ctp-theme` from the input’s ancestors (or accept an explicit `theme="dark"` prop) so time and datetime popovers stay dark too.
+
+Focusable controls use `:focus-visible` rings via `--ctp-focus`. Open animation respects `prefers-reduced-motion`.
+
 ## Locales
+
+Locales are applied per instance (no global dayjs locale mutation). Import the dayjs locale module before use:
 
 ```tsx
 import "dayjs/locale/fr";
