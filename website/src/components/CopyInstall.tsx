@@ -41,7 +41,7 @@ export default function CopyInstall() {
         <button type="button" className="btn btn-primary" onClick={copyInstall}>
           {copied ? "Copied" : "Copy install"}
         </button>
-        <a className="btn btn-ghost" href="#demo">
+        <a className="btn btn-ghost" href="#live-demo">
           Try the live demo
         </a>
       </div>

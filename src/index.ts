@@ -18,10 +18,13 @@ export type {
   DateRangeValue,
   DateTimeBaseProps,
   DateTimeInputProps,
+  DateTimeLabels,
+  DateTimeLayout,
   DateTimeMode,
   DateTimeProps,
   DateTimeRangeProps,
   DateTimeValue,
 } from "./types";
+export { DEFAULT_LABELS } from "./types";
 export { buildCalendarMonth } from "./calendar";
 export { dayjs, DEFAULT_FORMAT, DATE_FORMAT, TIME_FORMAT } from "./utils/date";

@@ -3,14 +3,12 @@ import customParseFormat from "dayjs/plugin/customParseFormat";
 import isSameOrAfter from "dayjs/plugin/isSameOrAfter";
 import isSameOrBefore from "dayjs/plugin/isSameOrBefore";
 import localeData from "dayjs/plugin/localeData";
-import updateLocale from "dayjs/plugin/updateLocale";
 import weekday from "dayjs/plugin/weekday";
 
 dayjs.extend(customParseFormat);
 dayjs.extend(isSameOrAfter);
 dayjs.extend(isSameOrBefore);
 dayjs.extend(localeData);
-dayjs.extend(updateLocale);
 dayjs.extend(weekday);
 
 export { dayjs };
@@ -83,27 +81,24 @@ export function to24Hour(hour12: number, isAm: boolean): number {
   return isAm ? hour12 : hour12 + 12;
 }
 
-/**
- * Applies a dayjs locale. Consumers should import the locale module first, e.g.
- * `import "dayjs/locale/fr"`, then pass `locale="fr"`.
- */
-export function applyLocale(locale: string, weekStartsOn: number): void {
-  dayjs.locale(locale);
-  try {
-    dayjs.updateLocale(locale, {
-      weekStart: weekStartsOn,
-    });
-  } catch {
-    // Locale may not be registered yet; weekday order is still handled by weekStartsOn.
-  }
+/** Formats a date with an instance locale (does not mutate global dayjs locale). */
+export function formatLocalized(
+  date: Dayjs,
+  template: string,
+  locale: string
+): string {
+  return date.locale(locale).format(template);
 }
 
+/**
+ * Weekday labels for the given locale without mutating the global dayjs locale.
+ * Consumers should import the locale module first, e.g. `import "dayjs/locale/fr"`.
+ */
 export function getWeekdayLabels(
   locale: string,
   weekStartsOn: number
 ): string[] {
-  applyLocale(locale, weekStartsOn);
-  const labels = dayjs.localeData().weekdaysMin();
+  const labels = dayjs().locale(locale).localeData().weekdaysMin();
   return [...labels.slice(weekStartsOn), ...labels.slice(0, weekStartsOn)];
 }
 

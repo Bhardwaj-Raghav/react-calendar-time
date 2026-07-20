@@ -1,4 +1,4 @@
-import { useMemo, useRef } from "react";
+import { useCallback, useMemo, useState } from "react";
 import { DateTime } from "./DateTime";
 import { useControllableState } from "./hooks/useControllableState";
 import type { DateTimeInputProps } from "./types";
@@ -34,7 +34,7 @@ export function DateTimeInput(props: DateTimeInputProps) {
     ...pickerProps
   } = props;
 
-  const inputRef = useRef<HTMLInputElement>(null);
+  const [anchorEl, setAnchorEl] = useState<HTMLInputElement | null>(null);
 
   const controlledFormatted =
     value !== undefined
@@ -62,10 +62,14 @@ export function DateTimeInput(props: DateTimeInputProps) {
 
   const display = internalValue ?? "";
 
+  const setInputRef = useCallback((node: HTMLInputElement | null) => {
+    setAnchorEl(node);
+  }, []);
+
   return (
     <div className={cx("ctp-input-root", className)} style={style}>
       <input
-        ref={inputRef}
+        ref={setInputRef}
         id={id}
         name={name}
         className={cx("ctp-input", inputClassName)}
@@ -99,7 +103,7 @@ export function DateTimeInput(props: DateTimeInputProps) {
         open={open}
         onOpenChange={setOpen}
         popover
-        anchorEl={inputRef.current}
+        anchorEl={anchorEl}
         onChange={(next) => {
           setInternalValue(next);
         }}
