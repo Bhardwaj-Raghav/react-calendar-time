@@ -38,16 +38,53 @@ export default function CopyInstall() {
   return (
     <>
       <div className="hero-actions">
-        <button type="button" className="btn btn-primary" onClick={copyInstall}>
-          {copied ? "Copied" : "Copy install"}
-        </button>
         <a className="btn btn-ghost" href="#live-demo">
           Try the live demo
         </a>
       </div>
-      <pre className="install-line" tabIndex={0}>
-        <code>{INSTALL}</code>
-      </pre>
+      <div className="install-line">
+        <pre tabIndex={0}>
+          <code>{INSTALL}</code>
+        </pre>
+        <button
+          type="button"
+          className="install-copy"
+          onClick={copyInstall}
+          aria-label={copied ? "Copied" : "Copy install command"}
+          title={copied ? "Copied" : "Copy"}
+        >
+          {copied ? (
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          ) : (
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden="true"
+            >
+              <rect x="9" y="9" width="13" height="13" rx="2" ry="2" />
+              <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1" />
+            </svg>
+          )}
+        </button>
+      </div>
     </>
   );
 }

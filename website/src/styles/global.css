@@ -196,15 +196,50 @@ a {
 }
 
 .install-line {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
   margin: 0;
-  padding: 0.7rem 0.9rem;
+  padding: 0.45rem 0.45rem 0.45rem 0.9rem;
   width: fit-content;
   max-width: 100%;
-  overflow-x: auto;
   border-radius: 0.6rem;
   background: rgba(20, 32, 25, 0.92);
   color: #dce8d2;
   font-size: 0.82rem;
+}
+
+.install-line pre {
+  margin: 0;
+  overflow-x: auto;
+  max-width: 100%;
+}
+
+.install-copy {
+  appearance: none;
+  flex-shrink: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2rem;
+  height: 2rem;
+  padding: 0;
+  border: none;
+  border-radius: 0.4rem;
+  background: transparent;
+  color: #dce8d2;
+  cursor: pointer;
+  transition: background 160ms ease, color 160ms ease;
+}
+
+.install-copy:hover {
+  background: rgba(220, 232, 210, 0.12);
+  color: #f5faf0;
+}
+
+.install-copy:focus-visible {
+  outline: 2px solid var(--leaf);
+  outline-offset: 2px;
 }
 
 .hero-stage {
