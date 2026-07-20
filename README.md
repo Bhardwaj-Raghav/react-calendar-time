@@ -1,5 +1,5 @@
 [![npm](https://img.shields.io/npm/v/react-calendar-time.svg)](https://www.npmjs.com/package/react-calendar-time)
-[![CI](https://github.com/Bhardwaj-Raghav/react-datetime-picker-component/actions/workflows/ci.yml/badge.svg)](https://github.com/Bhardwaj-Raghav/react-datetime-picker-component/actions/workflows/ci.yml)
+[![CI](https://github.com/Bhardwaj-Raghav/react-calendar-time/actions/workflows/ci.yml/badge.svg)](https://github.com/Bhardwaj-Raghav/react-calendar-time/actions/workflows/ci.yml)
 
 # react-calendar-time
 

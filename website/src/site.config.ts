@@ -10,6 +10,6 @@ export const SITE_KEYWORDS =
   "react date picker, react time picker, react datetime picker, react calendar, accessible datepicker, typescript date picker, dayjs, date range picker";
 
 export const GITHUB_URL =
-  "https://github.com/Bhardwaj-Raghav/react-datetime-picker-component";
+  "https://github.com/Bhardwaj-Raghav/react-calendar-time";
 
 export const NPM_URL = "https://www.npmjs.com/package/react-calendar-time";
